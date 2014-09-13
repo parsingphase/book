@@ -1,0 +1,14 @@
+{% extends 'layout.html.twig' %}
+
+{% block sidebar %}
+    {{ parent() }}
+    <div class="well well-sm text-center">
+        <p><a href="{{ path('blog.index') }}">Blog index</a></p>
+
+        <p><a href="{{ path('blog.archive') }}">Blog archive</a></p>
+        {% if is_granted('ROLE_ADMIN') %}
+            <p><a href="{{ path('blog.newPost') }}">New post</a></p>
+
+        {% endif %}
+    </div>
+{% endblock %}

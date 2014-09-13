@@ -1,0 +1,51 @@
+{% extends '@blog/layout-blog.html.twig' %}
+
+{% block title %}{% if title is defined %}{{ title }}{% else %}Edit Post{% endif %} | Blog{% endblock %}
+
+{% block content %}
+    <div>
+
+        <div class="well">
+            {% if is_granted('ROLE_ADMIN') %}
+                {#<form action="#" method="post" role="form">#}
+                {% set form = blogPostForm %}
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
+
+                <div class="form-group">
+                    {{ form_label(form.subject) }}
+                    {{ form_errors(form.subject) }}
+                    {{ form_widget(form.subject, {'attr': {'class': 'form-control' }}) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.security) }}
+                    {{ form_errors(form.security) }}
+                    {{ form_widget(form.security, {'attr': {'class': 'form-control' }}) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_row(form.time) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.body) }}
+                    {{ form_errors(form.body) }}
+                    {{ form_widget(form.body, {'attr': {'class': 'form-control', 'rows': 12 }}) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.save) }}
+                    {#{{ form_errors(form.save) }}#}
+                    {{ form_widget(form.save, {'attr': {'class': 'btn btn-default' }}) }}
+                </div>
+                {{ form_end(form) }}
+                {#<input type="submit" name="submit" class="btn"/>#}
+                {#</form>#}
+            {% else %}
+                <div class="alert alert-danger">Admin access only</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

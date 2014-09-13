@@ -1,0 +1,34 @@
+{% extends '@blog/layout-blog.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+    <div>
+        <h1>Blog index</h1>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="pull-right">{{ post.time|date('Y-m-d H:i') }}</div>
+                        {% if not post.public %}<span class="glyphicon glyphicon-eye-close"></span>{% endif %}
+                        {% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span>{% endif %}
+                        {{ post.subject }}
+                    </div>
+                    <div class="panel-body">
+                        {{ post.body|raw|nl2br }}
+                    </div>
+                    <div class="panel-footer">
+                        <div class="pull-right">
+                            <a href="{{ path('blog.post',{uid: post.id, slug: post.slug}) }}">Permalink</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="bg-warning">
+                No posts yet
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

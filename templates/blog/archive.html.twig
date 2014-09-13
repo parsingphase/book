@@ -1,0 +1,25 @@
+{% extends '@blog/layout-blog.html.twig' %}
+
+{% block title %}Blog Archive{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Blog Archive</h1>
+    {% if posts %}
+    <div class="well">
+        {% for post in posts %}
+        <p>
+            {{ post.time|date('Y-m-d H:i') }}
+            {% if not post.public %}<span class="glyphicon glyphicon-eye-close"></span>{% endif %}
+            {% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span>{% endif %}
+            <a href="{{ path('blog.post',{uid: post.id, slug: post.slug}) }}">{{ post.subject }}</a>
+        </p>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="bg-warning">
+        No posts yet
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
