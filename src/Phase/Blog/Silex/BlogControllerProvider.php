@@ -40,7 +40,7 @@ class BlogControllerProvider implements ControllerProviderInterface
 
 
         //TODO add routes here
-        $app = AdzeApplication::assertAdzeApplication($app);
+        $app->getTwigFilesystemLoader()->addPath(dirname(dirname(dirname(dirname(__DIR__)))) . '/templates/blog', 'blog');
 
 
         $app['blog.controller'] = $app->share(
