@@ -2,10 +2,12 @@
 
 {% extends '@blog/layout-blog.html.twig' %}
 
-{% block title %}{{ post.subject }} | Blog{% endblock %}
+{% block pageTitle %}{{ post.subject }} | Blog{% endblock %}
 
 {% block content %}
-    {{ blog.singlePagePost(post) }}
+    <div class="blogPage blogPageSinglePost">
+        {{ blog.singlePagePost(post) }}
+    </div>
 {% endblock %}
 
 {#{% block sidebar %}#}

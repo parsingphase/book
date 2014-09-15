@@ -9,7 +9,7 @@
         <div class="panel-heading">
             <div class="pull-right">Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}</div>
             {{ blog.postStatusIcons(post) }}
-            {{ post.subject }}
+            <span class="blogSubject">{{ post.subject }}</span>
         </div>
         <div class="panel-body">
             {{ post.body|raw|nl2br }}
@@ -34,7 +34,7 @@
         </div>
 
         <h1>{{ blog.postStatusIcons(post) }}
-            {{ post.subject }}</h1>
+            <span class="blogSubject">{{ post.subject }}</span></h1>
 
         <div class="well">
             {{ post.body|raw|nl2br }}
