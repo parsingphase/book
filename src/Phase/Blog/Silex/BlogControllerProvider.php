@@ -40,13 +40,16 @@ class BlogControllerProvider implements ControllerProviderInterface
 
 
         //TODO add routes here
-        $app->getTwigFilesystemLoader()->addPath(dirname(dirname(dirname(dirname(__DIR__)))) . '/templates/blog', 'blog');
+        $app->getTwigFilesystemLoader()->addPath(
+            dirname(dirname(dirname(dirname(__DIR__)))) . '/templates/blog',
+            'blog'
+        );
 
 
         $app['blog.controller'] = $app->share(
             function (AdzeApplication $app) {
                 $dbConnection = $app->getDatabaseConnection();
-                $blog = new Blog($dbConnection);
+                $blog = new Blog($dbConnection, $app);
                 $blogController = new BlogController($blog, $app);
                 return $blogController;
             }

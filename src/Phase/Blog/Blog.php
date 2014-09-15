@@ -10,6 +10,8 @@ namespace Phase\Blog;
 
 
 use Doctrine\DBAL\Connection;
+use Phase\Adze\Application;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * Access class for posts on a blog
@@ -24,12 +26,23 @@ class Blog
     protected $dbConnection;
 
     /**
+     * @var Application
+     */
+    protected $app;
+
+    /**
+     * //TODO take in $app[] instead of DB and use user.provider, blog.provider ??? as per \SimpleUser\UserManager::__construct
+     * TODO need to add a BlogServiceProvider? (User dataobject does not have access to $app, only UserManager does)
+     * TODO so need Blog(Manager)::hydrateBlogPost($blogPost) calls $blogPost -> setCreator($userManager->getUser($blogPost->getCreatorId))?
+     *
      * Set up access class using given DB connection
      * @param Connection $dbConnection
+     * @param Application $app
      */
-    public function __construct(Connection $dbConnection)
+    public function __construct(Connection $dbConnection, Application $app)
     {
         $this->dbConnection = $dbConnection;
+        $this->app = $app;
     }
 
     /**
@@ -48,7 +61,8 @@ class Blog
                     'time' => $blogPost->getTime()->format('Y-m-d H:i:s'),
                     'subject' => $blogPost->getSubject(),
                     'body' => $blogPost->getBody(),
-                    'security' => $blogPost->getSecurity()
+                    'security' => $blogPost->getSecurity(),
+                    'creatorId' => $blogPost->getCreator()->getId()
                 ],
                 ['id' => $blogPost->getId()]
             );
@@ -65,7 +79,8 @@ class Blog
                     'time' => $blogPost->getTime()->format('Y-m-d H:i:s'),
                     'subject' => $blogPost->getSubject(),
                     'body' => $blogPost->getBody(),
-                    'security' => $blogPost->getSecurity()
+                    'security' => $blogPost->getSecurity(),
+                    'creatorId' => $blogPost->getCreator()->getId()
                 ]
             );
 
@@ -134,7 +149,7 @@ class Blog
             $whereClause = '';
         }
 
-        $sql = 'SELECT * FROM blog_post ' . $whereClause . ' ORDER BY `time` DESC LIMIT ' . $count;
+        $sql = "SELECT * FROM blog_post $whereClause ORDER BY `time` DESC LIMIT $count";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
             $posts[] = $this->createPostFromDbRow($row);
@@ -175,7 +190,7 @@ class Blog
 
         $posts = [];
 
-        $sql = 'SELECT id,`time`,subject,security, null as body FROM blog_post ' . $whereClause . ' ORDER BY `time` DESC';
+        $sql = "SELECT id,`time`,subject,security, null as body,creatorId FROM blog_post $whereClause ORDER BY `time` DESC";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
             $posts[] = $this->createPostFromDbRow($row);
@@ -191,12 +206,20 @@ class Blog
      */
     protected function createPostFromDbRow($row)
     {
+        $creator = $this->app->getUserManager()->getUser($row['creatorId']);
+
+        if (!$creator) {
+            throw new InvalidParameterException("No such user");
+        }
+
         $post = new BlogPost();
         $post->setId($row['id']);
         $post->setSubject($row['subject']);
         $post->setTime(new \DateTime($row['time']));
         $post->setBody($row['body']);
         $post->setSecurity($row['security']);
+
+        $post->setCreator($creator);
         return $post;
     }
 }

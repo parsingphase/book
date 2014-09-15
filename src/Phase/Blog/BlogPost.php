@@ -10,6 +10,7 @@ namespace Phase\Blog;
 
 
 use DateTime;
+use SimpleUser\User;
 
 /**
  * Single blog entry, savable through the Blog class
@@ -31,6 +32,11 @@ class BlogPost
     protected $subject;
     protected $body;
     protected $security = self::SECURITY_PUBLIC;
+
+    /**
+     * @var User
+     */
+    protected $creator;
 
     /**
      * @param mixed $body
@@ -133,13 +139,37 @@ class BlogPost
         return (strtolower($slug));
     }
 
+    /**
+     * @return bool
+     */
     public function isInPast()
     {
         return $this->getTime() <= new DateTime();
     }
 
+    /**
+     * @return bool
+     */
     public function isPublic()
     {
         return $this->getSecurity() == self::SECURITY_PUBLIC;
+    }
+
+    /**
+     * @return User
+     */
+    public function getCreator()
+    {
+        return $this->creator;
+    }
+
+    /**
+     * @param User $creator
+     * @return $this
+     */
+    public function setCreator(User $creator)
+    {
+        $this->creator = $creator;
+        return $this;
     }
 }
