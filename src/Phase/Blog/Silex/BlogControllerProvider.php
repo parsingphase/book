@@ -34,17 +34,17 @@ class BlogControllerProvider implements ControllerProviderInterface
      */
     public function connect(SilexApplication $app)
     {
-        // TODO: Implement connect() method.
         $app = AdzeApplication::assertAdzeApplication($app);
         $controllers = $app->getControllerFactory();
 
+        $moduleBaseDir = dirname(dirname(dirname(dirname(__DIR__))));
 
-        //TODO add routes here
         $app->getTwigFilesystemLoader()->addPath(
-            dirname(dirname(dirname(dirname(__DIR__)))) . '/templates/blog',
+            $moduleBaseDir . '/templates/blog',
             'blog'
         );
 
+        $app->getResourceController()->addPathMapping('parsingphase/blog', $moduleBaseDir . '/resources');
 
         $app['blog.controller'] = $app->share(
             function (AdzeApplication $app) {

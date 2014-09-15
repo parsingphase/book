@@ -1,5 +1,12 @@
 {% extends 'layout.html.twig' %}
 
+{% block headerLinks %}
+    {{ parent() }}
+    <!--suppress HtmlUnknownTarget -->
+    <link type="text/css" media="all" rel="stylesheet"
+          href="/resources/parsingphase/blog/blog.css"/>
+{% endblock %}
+
 {% block sidebar %}
     {{ parent() }}
     <div class="well well-sm text-center">

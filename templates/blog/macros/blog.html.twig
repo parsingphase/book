@@ -26,7 +26,7 @@
 {% macro singlePagePost(post) %}
     {% import _self as blog %}
 
-    <div>
+    <div class="singlePageBlogPost">
         <div class="pull-right">
             {% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"
                                                 href="{{ path('blog.editPost',{uid: post.id, slug: post.slug}) }}"><span
@@ -38,8 +38,9 @@
 
         <div class="well">
             {{ post.body|raw|nl2br }}
-            <div class="clearfix"></div>
-            <div class="pull-right"><i>Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}</i></div>
+            <div class="pull-right attribution">
+                Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}
+            </div>
             <div class="clearfix"></div>
         </div>
     </div>
