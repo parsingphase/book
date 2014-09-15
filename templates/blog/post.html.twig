@@ -1,23 +1,11 @@
+{% import '@blog/macros/blog.html.twig' as blog %}
+
 {% extends '@blog/layout-blog.html.twig' %}
 
 {% block title %}{{ post.subject }} | Blog{% endblock %}
 
 {% block content %}
-    <div>
-        <div class="pull-right">{{ post.time|date('Y-m-d H:i') }}
-            {% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"
-                                                href="{{ path('blog.editPost',{uid: post.id, slug: post.slug}) }}"><span
-                        class="glyphicon glyphicon-pencil"></span> Edit</a> {% endif %}
-        </div>
-
-        <h1>{% if not post.public %}<span class="glyphicon glyphicon-eye-close"></span> {% endif -%}
-            {% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span> {% endif -%}
-            {{ post.subject }}</h1>
-
-        <div class="well">
-            {{ post.body|raw|nl2br }}
-        </div>
-    </div>
+    {{ blog.singlePagePost(post) }}
 {% endblock %}
 
 {#{% block sidebar %}#}

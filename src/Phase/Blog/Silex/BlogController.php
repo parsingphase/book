@@ -88,6 +88,9 @@ class BlogController
 
         $blogPost = new BlogPost();
         $blogPost->setTime(new \DateTime());
+        $creator = $this->app->getCurrentUser();
+        $blogPost->setCreator($creator);
+
         $form = $this->createBlogPostForm($blogPost, $action);
 
         $form->handleRequest($request);

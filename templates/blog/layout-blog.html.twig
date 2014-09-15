@@ -8,7 +8,6 @@
         <p><a href="{{ path('blog.archive') }}">Blog archive</a></p>
         {% if is_granted('ROLE_ADMIN') %}
             <p><a href="{{ path('blog.newPost') }}">New post</a></p>
-
         {% endif %}
     </div>
 {% endblock %}

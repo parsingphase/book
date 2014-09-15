@@ -54,6 +54,12 @@ class Blog
     public function savePost(BlogPost $blogPost)
     {
         $return = false;
+        $creator = $blogPost->getCreator();
+
+        if (!$creator) {
+            throw new InvalidParameterException("Invalid user");
+        }
+
         if ($blogPost->getId()) {
             $updateCount = $this->dbConnection->update(
                 'blog_post',
@@ -62,7 +68,7 @@ class Blog
                     'subject' => $blogPost->getSubject(),
                     'body' => $blogPost->getBody(),
                     'security' => $blogPost->getSecurity(),
-                    'creatorId' => $blogPost->getCreator()->getId()
+                    'creatorId' => $creator->getId()
                 ],
                 ['id' => $blogPost->getId()]
             );
@@ -80,7 +86,7 @@ class Blog
                     'subject' => $blogPost->getSubject(),
                     'body' => $blogPost->getBody(),
                     'security' => $blogPost->getSecurity(),
-                    'creatorId' => $blogPost->getCreator()->getId()
+                    'creatorId' => $creator->getId()
                 ]
             );
 

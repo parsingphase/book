@@ -1,0 +1,46 @@
+{% macro postStatusIcons(post) %}
+    {% if not post.public %}<span class="glyphicon glyphicon-eye-close"></span>{% endif %}
+    {% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span>{% endif %}
+{% endmacro %}
+
+{% macro indexPagePost(post) %}
+    {% import _self as blog %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="pull-right">Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}</div>
+            {{ blog.postStatusIcons(post) }}
+            {{ post.subject }}
+        </div>
+        <div class="panel-body">
+            {{ post.body|raw|nl2br }}
+        </div>
+        <div class="panel-footer">
+            <div class="pull-right">
+                <a href="{{ path('blog.post',{uid: post.id, slug: post.slug}) }}">Permalink</a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro singlePagePost(post) %}
+    {% import _self as blog %}
+
+    <div>
+        <div class="pull-right">
+            {% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"
+                                                href="{{ path('blog.editPost',{uid: post.id, slug: post.slug}) }}"><span
+                        class="glyphicon glyphicon-pencil"></span> Edit</a> {% endif %}
+        </div>
+
+        <h1>{{ blog.postStatusIcons(post) }}
+            {{ post.subject }}</h1>
+
+        <div class="well">
+            {{ post.body|raw|nl2br }}
+            <div class="clearfix"></div>
+            <div class="pull-right"><i>Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}</i></div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
