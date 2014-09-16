@@ -1,4 +1,4 @@
-# parsingphase/blog
+# parsingphase/blog [![Build Status](https://travis-ci.org/parsingphase/blog.svg?branch=master)](https://travis-ci.org/parsingphase/blog)
 
 Blog module for the [parsingphase/adze](https://github.com/parsingphase/adze) silex-based platform.
 
