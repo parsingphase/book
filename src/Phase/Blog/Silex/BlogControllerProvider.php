@@ -34,6 +34,9 @@ class BlogControllerProvider implements ControllerProviderInterface
      */
     public function connect(SilexApplication $app)
     {
+        // Make sure we're using an Adze app, and use that knowledge to set up the required template and resource paths
+        // It's possible we should really do this as a ServiceProvider ... ?
+
         $app = AdzeApplication::assertAdzeApplication($app);
         $controllers = $app->getControllerFactory();
 
@@ -55,6 +58,21 @@ class BlogControllerProvider implements ControllerProviderInterface
             }
         );
 
+        // Now set up routes for the blog subsystem
+
+        /*
+         * We have a slight gotcha for IDE code analysis here; Adze defines the Route class that we get dynamically,
+         * and Phase\Adze\Route implements the \Silex\Route\SecurityTrait - but the object we call is a
+         * \Silex\ControllerCollection that uses __call to pass through to the route, leaving IDEs baffled and unable
+         * to recognise that ControllerCollection can handle ->secure()
+         *
+         * For PHPStorm, see http://stackoverflow.com/a/12583095/113076
+         *
+         * (Settings -> Inspections -> PHP -> Undefined -> Undefined Method -> Downgrade severity if __magic methods are present)
+         *
+         * TODO Move this explanation to a blogpost on phase.org and link to that as required
+         */
+
         $controllers->match(
             '/newPost',
             'blog.controller:newPostAction'
@@ -68,7 +86,7 @@ class BlogControllerProvider implements ControllerProviderInterface
         $controllers->match(
             '/{uid}_{slug}/edit',
             'blog.controller:editPostAction'
-        )->bind('blog.editPost')->assert('uid', '\d+')->method('POST|GET');
+        )->bind('blog.editPost')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
 
         $controllers->get(
             '/{uid}_{slug}',
