@@ -7,7 +7,9 @@
     {% import _self as blog %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="pull-right">Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}</div>
+            <div class="pull-right">Posted by {{ post.creator.name }},
+                <a href="{{ path('blog.post',{uid: post.id, slug: post.slug}) }}">{{ post.time|date('Y-m-d H:i') }}</a>
+            </div>
             {{ blog.postStatusIcons(post) }}
             <span class="blogSubject">{{ post.subject }}</span>
         </div>
