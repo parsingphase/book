@@ -1,19 +1,20 @@
-{% extends '@blog/layout-blog.html.twig' %}
+{% extends 'layout.html.twig' %}
+{#{% extends '@book/layout-blog.html.twig' %}#}
 
-{% import '@blog/macros/blog.html.twig' as blog %}
+{% import '@book/macros/book.html.twig' as book %}
 
-{% block pageTitle %}Blog{% endblock %}
+{#{% block pageTitle %}Blog{% endblock %}#}
 
 {% block content %}
     <div class="blogPage blogIndex">
-        <h1>Blog index</h1>
-        {% if posts %}
-            {% for post in posts %}
-                {{ blog.indexPagePost(post) }}
+        <h1>Table of Contents</h1>
+        {% if chapters %}
+            {% for chapter in chapters %}
+                {{ book.indexPagePost(chapter) }}
             {% endfor %}
         {% else %}
             <div class="bg-warning">
-                No posts yet
+                No content yet
             </div>
         {% endif %}
     </div>

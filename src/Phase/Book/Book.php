@@ -46,7 +46,7 @@ class Book
     }
 
     /**
-     * Store a blog post to the configured DBAL
+     * Store a chapter to the configured DBAL
      *
      * @param Chapter $chapter
      * @return bool
@@ -62,7 +62,7 @@ class Book
 
         if ($chapter->getId()) {
             $updateCount = $this->dbConnection->update(
-                'chapters',
+                'chapter',
                 [
                     // Don't allow revision of creation time?
                     'updated_at' => $chapter->getCreationTime()->format('Y-m-d H:i:s'),
@@ -85,7 +85,7 @@ class Book
             $creationTimeString = $chapter->getCreationTime()->format('Y-m-d H:i:s');
 
             $updateCount = $this->dbConnection->insert(
-                'chapters',
+                'chapter',
                 [
                     'created_at' => $creationTimeString,
                     'updated_at' => $creationTimeString,
@@ -113,7 +113,7 @@ class Book
     }
 
     /**
-     * Load a blog post from the configured DBAL by primary key
+     * Load a chapter from the configured DBAL by primary key
      *
      * @param $presentPostId
      * @return null|Chapter
@@ -121,8 +121,25 @@ class Book
     public function fetchChapterById($presentPostId)
     {
         $post = null;
-        $sql = 'SELECT * FROM chapters WHERE id=?';
+        $sql = 'SELECT * FROM chapter WHERE id=?';
         $row = $this->dbConnection->fetchAssoc($sql, [$presentPostId]);
+        if ($row) {
+            $post = $this->createChapterFromDbRow($row);
+        }
+        return $post;
+    }
+
+    /**
+     * Load a chapter from the configured DBAL by chapter number
+     *
+     * @param $chapterNumber
+     * @return null|Chapter
+     */
+    public function fetchChapterByChapterNumber($chapterNumber)
+    {
+        $post = null;
+        $sql = 'SELECT * FROM chapter WHERE chapter_id=? ORDER BY is_activated DESC LIMIT 1';
+        $row = $this->dbConnection->fetchAssoc($sql, [$chapterNumber]);
         if ($row) {
             $post = $this->createChapterFromDbRow($row);
         }
@@ -161,7 +178,7 @@ class Book
             $whereClause = '';
         }
 
-        $sql = "SELECT * FROM chapters $whereClause ORDER BY `chapter_id` DESC";
+        $sql = "SELECT * FROM chapter $whereClause ORDER BY `chapter_id` ASC";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
             $posts[] = $this->createChapterFromDbRow($row);
@@ -203,7 +220,7 @@ class Book
         $posts = [];
 
         $sql = "SELECT id,chapter_id,title,is_activated, null as body_text,created_at,updated_at
-          FROM chapters $whereClause ORDER BY `chapter_id` DESC";
+          FROM chapter $whereClause ORDER BY `chapter_id` ASC";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
             $posts[] = $this->createChapterFromDbRow($row);

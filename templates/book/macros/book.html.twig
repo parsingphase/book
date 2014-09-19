@@ -1,0 +1,46 @@
+{% macro chapterStatusIcons(chapter) %}
+    {% if not chapter.active %}<span class="glyphicon glyphicon-eye-close"></span>{% endif %}
+    {#{% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span>{% endif %}#}
+{% endmacro %}
+
+{% macro indexPagePost(chapter) %}
+    {% import _self as book %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="{{ path('book.readChapter',{chapterId: chapter.id, slug: chapter.slug}) }}">{{ book.chapterStatusIcons(chapter) }}
+                <span class="chapterTitle">{{ chapter.chapterNumber }}) {{ chapter.subject }}</span></a>
+        </div>
+        <div class="panel-body">
+            {{ chapter.body|striptags|slice(0,600) }}...
+        </div>
+        <div class="panel-footer">
+            <div class="pull-right">
+                <a href="{{ path('book.readChapter',{chapterId: chapter.id, slug: chapter.slug}) }}">Permalink</a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro singlePagePost(chapter) %}
+    {% import _self as book %}
+
+    <div class="singlePageBlogPost">
+        <div class="pull-right">
+            {#{% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"#}
+            {#href="{{ path('book.editPost',{uid: post.id, slug: post.slug}) }}"><span#}
+            {#class="glyphicon glyphicon-pencil"></span> Edit</a> {% endif %}#}
+        </div>
+
+        <h1>{{ book.chapterStatusIcons(chapter) }}
+            <span class="chapterTitle">{{ chapter.subject }}</span></h1>
+
+        <div class="well">
+            {{ chapter.body|raw|nl2br }}
+            <div class="pull-right attribution">
+                {#Posted by {{ post.creator.name }}, {{ post.time|date('Y-m-d H:i') }}#}
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}

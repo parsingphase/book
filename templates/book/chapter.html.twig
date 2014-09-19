@@ -1,12 +1,13 @@
-{% import '@blog/macros/blog.html.twig' as blog %}
+{% extends 'layout.html.twig' %}
+{#{% extends '@book/layout-blog.html.twig' %}#}
 
-{% extends '@blog/layout-blog.html.twig' %}
+{% import '@book/macros/book.html.twig' as book %}
 
-{% block pageTitle %}{{ post.subject }} | Blog{% endblock %}
+{% block pageTitle %}{{ chapter.subject }}{% endblock %}
 
 {% block content %}
     <div class="blogPage blogPageSinglePost">
-        {{ blog.singlePagePost(post) }}
+        {{ book.singlePagePost(chapter) }}
     </div>
 {% endblock %}
 

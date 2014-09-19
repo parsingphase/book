@@ -74,24 +74,24 @@ class BookControllerProvider implements ControllerProviderInterface
          */
 
         $controllers->match(
-            '/newPost',
-            'book.controller:newPostAction'
-        )->bind('book.newPost')->method('POST|GET');
+            '/new',
+            'book.controller:newChapterAction'
+        )->bind('book.newChapter')->method('POST|GET');
 
-        $controllers->get(
-            '/archive',
-            'book.controller:archiveAction'
-        )->bind('book.archive');
+//        $controllers->get(
+//            '/archive',
+//            'book.controller:archiveAction'
+//        )->bind('book.archive');
 
         $controllers->match(
-            '/{uid}_{slug}/edit',
-            'book.controller:editPostAction'
-        )->bind('book.editPost')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
+            '/part/{chapterId}/{slug}/edit',
+            'book.controller:editChapterAction'
+        )->bind('book.editChapter')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
 
         $controllers->get(
-            '/{uid}_{slug}',
-            'book.controller:singlePostAction'
-        )->bind('book.post')->assert('uid', '\d+');
+            '/part/{chapterId}/{slug}',
+            'book.controller:readChapterAction'
+        )->bind('book.readChapter')->assert('chapterId', '\d+');
 
         $controllers->get(
             '/',

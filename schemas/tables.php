@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Type;
 
 $tables = [];
 
-$chapters = new Table('chapters');
+$chapters = new Table('chapter');
 $chapters->addColumn('id', Type::INTEGER, ['unsigned' => true, 'autoincrement' => true]);
 $chapters->setPrimaryKey(['id']);
 $chapters->addColumn('chapter_id', Type::INTEGER, ['unsigned' => true]);
@@ -21,7 +21,7 @@ $chapters->addColumn('is_activated', Type::INTEGER, ['unsigned' => true]);
 $chapters->addColumn('created_at', Type::DATETIME)->setNotnull(true); // see if sqlite handles this?
 $chapters->addColumn('updated_at', Type::DATETIME)->setNotnull(true); // see if sqlite handles this?
 
-$tables['chapters'] = $chapters;
+$tables['chapter'] = $chapters;
 
 
 return $tables;

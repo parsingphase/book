@@ -41,31 +41,29 @@ class BookController
 
     public function indexAction()
     {
-        $pastOnly = $publicOnly = !$this->app->getSecurityContext()->isGranted('ROLE_ADMIN');
-        $posts = $this->blog->fetchChapters(5, $publicOnly, $pastOnly);
-        return $this->app->render('@blog/index.html.twig', ['posts' => $posts]);
+        $chapters = $this->blog->fetchChapters();
+        return $this->app->render('@book/index.html.twig', ['chapters' => $chapters]);
     }
 
-    public function singlePostAction($uid, $slug)
+    public function readChapterAction($chapterId, $slug)
     {
-        $post = $this->blog->fetchChapterById($uid);
+        $chapter = $this->blog->fetchChapterById($chapterId);
 
-        if (!(
-            (($post->getSecurity() == Chapter::SECURITY_PUBLIC) && $post->getCreationTime() < new \DateTime())
+        if (!($chapter->isActive()
             || $this->app->getSecurityContext()->isGranted('ROLE_ADMIN'))
         ) {
             throw new AccessDeniedHttpException; // FIXME just 404?
         }
 
-        if ($slug !== $post->getSlug()) {
+        if ($slug !== $chapter->getSlug()) {
             return $this->app->redirect(
                 $this->app->path(
-                    'blog.post',
-                    ['uid' => $uid, 'slug' => $post->getSlug()]
+                    'book.readChapter',
+                    ['chapterId' => $chapterId, 'slug' => $chapter->getSlug()]
                 )
             );
         }
-        return $this->app->render('@blog/post.html.twig', ['post' => $post]);
+        return $this->app->render('@book/chapter.html.twig', ['chapter' => $chapter]);
     }
 
     public function archiveAction()

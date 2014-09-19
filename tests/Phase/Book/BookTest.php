@@ -108,7 +108,7 @@ class BookTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($tablesPresent) && count($tablesPresent), 'Must get some tables');
 
-        $requiredTables = ['chapters'];
+        $requiredTables = ['chapter'];
 
         foreach ($requiredTables as $table) {
             $this->assertTrue(in_array($table, $tablesPresent), "Table '$table' is required");
@@ -150,9 +150,9 @@ class BookTest extends \PHPUnit_Framework_TestCase
             'chapter_id' => 3
         ];
 
-        $this->dbConnection->insert('chapters', $rawPost);
+        $this->dbConnection->insert('chapter', $rawPost);
 
-        $sql = "SELECT MIN(id) FROM chapters";
+        $sql = "SELECT MIN(id) FROM chapter";
         $presentPostId = $this->dbConnection->fetchColumn($sql);
 
         $this->assertTrue((bool)$presentPostId);
@@ -172,12 +172,15 @@ class BookTest extends \PHPUnit_Framework_TestCase
             'chapter_id' => 2
         ];
 
-        $this->dbConnection->insert('chapters', $rawPost);
+        $this->dbConnection->insert('chapter', $rawPost);
 
         $multiPosts = $book->fetchChapters();
         $this->assertTrue(is_array($multiPosts));
         $this->assertSame(2, count($multiPosts));
-        $this->assertTrue($multiPosts[0]->getChapterNumber() > $multiPosts[1]->getChapterNumber());
+        $this->assertTrue(
+            $multiPosts[0]->getChapterNumber() < $multiPosts[1]->getChapterNumber(),
+            'Chapters should be returned in order'
+        );
     }
 
     public function testWithTimeAndSecurity()
@@ -218,7 +221,7 @@ class BookTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($rawPosts as $rawPost) {
-            $this->dbConnection->insert('chapters', $rawPost);
+            $this->dbConnection->insert('chapter', $rawPost);
         }
 
         $blog = new Book($this->dbConnection, $this->application);
