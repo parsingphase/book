@@ -42,16 +42,16 @@ class BookController
     public function indexAction()
     {
         $pastOnly = $publicOnly = !$this->app->getSecurityContext()->isGranted('ROLE_ADMIN');
-        $posts = $this->blog->fetchRecentPosts(5, $publicOnly, $pastOnly);
+        $posts = $this->blog->fetchChapters(5, $publicOnly, $pastOnly);
         return $this->app->render('@blog/index.html.twig', ['posts' => $posts]);
     }
 
     public function singlePostAction($uid, $slug)
     {
-        $post = $this->blog->fetchPostById($uid);
+        $post = $this->blog->fetchChapterById($uid);
 
         if (!(
-            (($post->getSecurity() == Chapter::SECURITY_PUBLIC) && $post->getTime() < new \DateTime())
+            (($post->getSecurity() == Chapter::SECURITY_PUBLIC) && $post->getCreationTime() < new \DateTime())
             || $this->app->getSecurityContext()->isGranted('ROLE_ADMIN'))
         ) {
             throw new AccessDeniedHttpException; // FIXME just 404?
@@ -72,7 +72,7 @@ class BookController
     {
         $pastOnly = $publicOnly = !$this->app->getSecurityContext()->isGranted('ROLE_ADMIN');
 
-        $posts = $this->blog->fetchAllPostsNoBody($publicOnly, $pastOnly);
+        $posts = $this->blog->fetchAllChaptersNoBody($publicOnly, $pastOnly);
         return $this->app->render('@blog/archive.html.twig', ['posts' => $posts]);
     }
 
@@ -87,7 +87,7 @@ class BookController
         $action = $this->app->url('blog.newPost');
 
         $blogPost = new Chapter();
-        $blogPost->setTime(new \DateTime());
+        $blogPost->setCreationTime(new \DateTime());
         $creator = $this->app->getCurrentUser();
         $blogPost->setCreator($creator);
 
@@ -119,7 +119,7 @@ class BookController
             throw new AccessDeniedHttpException;
         }
 
-        $blogPost = $this->blog->fetchPostById($uid);
+        $blogPost = $this->blog->fetchChapterById($uid);
 
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
         $action = $this->app->url('blog.editPost', ['uid' => $blogPost->getId(), 'slug' => $blogPost->getSlug()]);

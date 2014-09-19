@@ -11,16 +11,17 @@ use Doctrine\DBAL\Types\Type;
 
 $tables = [];
 
-$blogPost = new Table('blog_post');
-$blogPost->addColumn('id', Type::INTEGER, ['unsigned' => true, 'autoincrement' => true]);
-$blogPost->setPrimaryKey(['id']);
-$blogPost->addColumn('time', Type::DATETIME)->setNotnull(true); // see if sqlite handles this?
-$blogPost->addColumn('subject', Type::STRING)->setLength(255)->setNotnull(true);
-$blogPost->addColumn('body', Type::TEXT)->setNotnull(true);
-$blogPost->addColumn('security', Type::STRING)->setNotnull(true); //TODO Enums not supported, use ints / class consts?
-$blogPost->addColumn('creatorId', Type::INTEGER)->setNotnull(true)->setDefault(1); // default for existing records
+$chapters = new Table('chapters');
+$chapters->addColumn('id', Type::INTEGER, ['unsigned' => true, 'autoincrement' => true]);
+$chapters->setPrimaryKey(['id']);
+$chapters->addColumn('chapter_id', Type::INTEGER, ['unsigned' => true]);
+$chapters->addColumn('title', Type::STRING)->setLength(255)->setNotnull(true);
+$chapters->addColumn('body_text', Type::TEXT)->setNotnull(true);
+$chapters->addColumn('is_activated', Type::INTEGER, ['unsigned' => true]);
+$chapters->addColumn('created_at', Type::DATETIME)->setNotnull(true); // see if sqlite handles this?
+$chapters->addColumn('updated_at', Type::DATETIME)->setNotnull(true); // see if sqlite handles this?
 
-$tables['blog_post'] = $blogPost;
+$tables['chapters'] = $chapters;
 
 
 return $tables;

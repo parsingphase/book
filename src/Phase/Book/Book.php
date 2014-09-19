@@ -48,52 +48,62 @@ class Book
     /**
      * Store a blog post to the configured DBAL
      *
-     * @param Chapter $blogPost
+     * @param Chapter $chapter
      * @return bool
      */
-    public function savePost(Chapter $blogPost)
+    public function savePost(Chapter $chapter)
     {
         $return = false;
-        $creator = $blogPost->getCreator();
+        //        $creator = $blogPost->getCreator();
 
-        if (!$creator) {
-            throw new InvalidParameterException("Invalid user");
-        }
+        //        if (!$creator) {
+        //            throw new InvalidParameterException("Invalid user");
+        //        }
 
-        if ($blogPost->getId()) {
+        if ($chapter->getId()) {
             $updateCount = $this->dbConnection->update(
-                'blog_post',
+                'chapters',
                 [
-                    'time' => $blogPost->getTime()->format('Y-m-d H:i:s'),
-                    'subject' => $blogPost->getSubject(),
-                    'body' => $blogPost->getBody(),
-                    'security' => $blogPost->getSecurity(),
-                    'creatorId' => $creator->getId()
+                    // Don't allow revision of creation time?
+                    'updated_at' => $chapter->getCreationTime()->format('Y-m-d H:i:s'),
+                    'title' => $chapter->getSubject(),
+                    'body_text' => $chapter->getBody(),
+                    'chapter_id' => $chapter->getChapterNumber(),
+                    'is_activated' => $chapter->isActive() ? 1 : 0
+                    //                    'security' => $blogPost->getSecurity(),
+                    //                    'creatorId' => $creator->getId()
                 ],
-                ['id' => $blogPost->getId()]
+                ['id' => $chapter->getId()]
             );
 
             $return = (bool)$updateCount;
         } else {
-            if (!$blogPost->getTime()) {
-                $blogPost->setTime(new \DateTime());
+            if (!$chapter->getCreationTime()) {
+                $chapter->setCreationTime(new \DateTime());
             }
 
+            $creationTimeString = $chapter->getCreationTime()->format('Y-m-d H:i:s');
+
             $updateCount = $this->dbConnection->insert(
-                'blog_post',
+                'chapters',
                 [
-                    'time' => $blogPost->getTime()->format('Y-m-d H:i:s'),
-                    'subject' => $blogPost->getSubject(),
-                    'body' => $blogPost->getBody(),
-                    'security' => $blogPost->getSecurity(),
-                    'creatorId' => $creator->getId()
+                    'created_at' => $creationTimeString,
+                    'updated_at' => $creationTimeString,
+                    'title' => $chapter->getSubject(),
+                    'body_text' => $chapter->getBody(),
+                    'chapter_id' => $chapter->getChapterNumber(),
+                    'is_activated' => $chapter->isActive() ? 1 : 0
+
+
+                    //                    'security' => $chapter->getSecurity(),
+                    //                    'creatorId' => $creator->getId()
                 ]
             );
 
             if ($updateCount) {
                 $id = $this->dbConnection->lastInsertId();
                 if ($id) {
-                    $blogPost->setId($id);
+                    $chapter->setId($id);
                     $return = true;
                 }
             }
@@ -108,13 +118,13 @@ class Book
      * @param $presentPostId
      * @return null|Chapter
      */
-    public function fetchPostById($presentPostId)
+    public function fetchChapterById($presentPostId)
     {
         $post = null;
-        $sql = 'SELECT * FROM blog_post WHERE id=?';
+        $sql = 'SELECT * FROM chapters WHERE id=?';
         $row = $this->dbConnection->fetchAssoc($sql, [$presentPostId]);
         if ($row) {
-            $post = $this->createPostFromDbRow($row);
+            $post = $this->createChapterFromDbRow($row);
         }
         return $post;
     }
@@ -122,32 +132,28 @@ class Book
     /**
      * Fetch $count of the most recent posts ordered newest-first, taking future time & security into account
      *
-     * @param int $count
      * @param bool $publicOnly
-     * @param bool $pastOnly
      * @throws \InvalidArgumentException
      * @return Chapter[]
      */
-    public function fetchRecentPosts($count = 5, $publicOnly = false, $pastOnly = false)
+    public function fetchChapters($publicOnly = true)
     {
         $posts = [];
-        if (!is_int($count)) {
-            throw new \InvalidArgumentException();
-        }
+
 
         $whereParts = [];
         $queryParams = [];
 
         if ($publicOnly) {
-            $whereParts[] = " security= :security ";
-            $queryParams['security'] = Chapter::SECURITY_PUBLIC;
+            $whereParts[] = " is_activated = 1 ";
+            //            $queryParams['security'] = Chapter::SECURITY_PUBLIC;
         }
-
-        if ($pastOnly) {
-            $now = new \DateTime();
-            $whereParts[] = " `time` <= :when "; // no "NOW()" in sqlite?
-            $queryParams['when'] = $now->format('Y-m-d H:i');
-        }
+        //
+        //        if ($pastOnly) {
+        //            $now = new \DateTime();
+        //            $whereParts[] = " `time` <= :when "; // no "NOW()" in sqlite?
+        //            $queryParams['when'] = $now->format('Y-m-d H:i');
+        //        }
 
         if ($whereParts) {
             $whereClause = ' WHERE ' . join(' AND ', $whereParts);
@@ -155,10 +161,10 @@ class Book
             $whereClause = '';
         }
 
-        $sql = "SELECT * FROM blog_post $whereClause ORDER BY `time` DESC LIMIT $count";
+        $sql = "SELECT * FROM chapters $whereClause ORDER BY `chapter_id` DESC";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
-            $posts[] = $this->createPostFromDbRow($row);
+            $posts[] = $this->createChapterFromDbRow($row);
         }
         return $posts;
     }
@@ -171,22 +177,22 @@ class Book
      * @param bool $pastOnly
      * @return Chapter[]
      */
-    public function fetchAllPostsNoBody($publicOnly = false, $pastOnly = false)
+    public function fetchAllChaptersNoBody($publicOnly = false, $pastOnly = false)
     {
 
         $whereParts = [];
         $queryParams = [];
 
         if ($publicOnly) {
-            $whereParts[] = " security= :security ";
-            $queryParams['security'] = Chapter::SECURITY_PUBLIC;
+            $whereParts[] = " is_activated = 1 ";
+
         }
 
-        if ($pastOnly) {
-            $now = new \DateTime();
-            $whereParts[] = " `time` <= :when "; // no "NOW()" in sqlite?
-            $queryParams['when'] = $now->format('Y-m-d H:i');
-        }
+        //        if ($pastOnly) {
+        //            $now = new \DateTime();
+        //            $whereParts[] = " `time` <= :when "; // no "NOW()" in sqlite?
+        //            $queryParams['when'] = $now->format('Y-m-d H:i');
+        //        }
 
         if ($whereParts) {
             $whereClause = ' WHERE ' . join(' AND ', $whereParts);
@@ -196,10 +202,11 @@ class Book
 
         $posts = [];
 
-        $sql = "SELECT id,`time`,subject,security, null as body,creatorId FROM blog_post $whereClause ORDER BY `time` DESC";
+        $sql = "SELECT id,chapter_id,title,is_activated, null as body_text,created_at,updated_at
+          FROM chapters $whereClause ORDER BY `chapter_id` DESC";
         $rows = $this->dbConnection->fetchAll($sql, $queryParams);
         foreach ($rows as $row) {
-            $posts[] = $this->createPostFromDbRow($row);
+            $posts[] = $this->createChapterFromDbRow($row);
         }
         return $posts;
     }
@@ -210,22 +217,17 @@ class Book
      * @param $row
      * @return Chapter
      */
-    protected function createPostFromDbRow($row)
+    protected function createChapterFromDbRow($row)
     {
-        $creator = $this->app->getUserManager()->getUser($row['creatorId']);
-
-        if (!$creator) {
-            throw new InvalidParameterException("No such user");
-        }
-
         $post = new Chapter();
         $post->setId($row['id']);
-        $post->setSubject($row['subject']);
-        $post->setTime(new \DateTime($row['time']));
-        $post->setBody($row['body']);
-        $post->setSecurity($row['security']);
+        $post->setChapterNumber($row['chapter_id']);
+        $post->setSubject($row['title']);
+        $post->setCreationTime(new \DateTime($row['created_at']));
+        $post->setUpdateTime(new \DateTime($row['updated_at']));
+        $post->setBody($row['body_text']);
+        $post->setActive((bool)$row['is_activated']);
 
-        $post->setCreator($creator);
         return $post;
     }
 }

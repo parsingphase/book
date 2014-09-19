@@ -23,17 +23,23 @@ class Chapter
      * @var int|null
      */
     protected $id;
+
+    protected $chapterId;
+
     /**
      * @var DateTime
      */
-    protected $time;
+    protected $creationTime;
+    /**
+     * @var DateTime
+     */
+    protected $updateTime;
     protected $subject;
     protected $body;
-
     /**
-     * @var User
+     * @var bool
      */
-    protected $creator;
+    protected $isActive = false;
 
     /**
      * @param mixed $body
@@ -74,6 +80,25 @@ class Chapter
     }
 
     /**
+     * @return mixed
+     */
+    public function getChapterNumber()
+    {
+        return $this->chapterId;
+    }
+
+    /**
+     * @param mixed $chapterId
+     * @return $this
+     */
+    public function setChapterNumber($chapterId)
+    {
+        $this->chapterId = $chapterId;
+        return $this;
+    }
+
+
+    /**
      * @param mixed $subject
      * @return $this
      */
@@ -95,19 +120,38 @@ class Chapter
      * @param DateTime $time
      * @return $this
      */
-    public function setTime(DateTime $time)
+    public function setCreationTime(DateTime $time)
     {
-        $this->time = $time;
+        $this->creationTime = $time;
         return $this;
     }
 
     /**
      * @return DateTime|null
      */
-    public function getTime()
+    public function getCreationTime()
     {
-        return $this->time;
+        return $this->creationTime;
     }
+
+    /**
+     * @return DateTime
+     */
+    public function getUpdateTime()
+    {
+        return $this->updateTime;
+    }
+
+    /**
+     * @param DateTime $updateTime
+     * @return $this
+     */
+    public function setUpdateTime($updateTime)
+    {
+        $this->updateTime = $updateTime;
+        return $this;
+    }
+
 
     public function getSlug()
     {
@@ -117,5 +161,25 @@ class Chapter
         $slug = preg_replace('/_{2,}/', '_', $slug);
         return (strtolower($slug));
     }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->isActive;
+    }
+
+    /**
+     * @param boolean $isActive
+     * @return $this
+     */
+    public function setActive($isActive)
+    {
+        $this->isActive = $isActive;
+        return $this;
+    }
+
+
 
 }

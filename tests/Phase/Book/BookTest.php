@@ -53,7 +53,7 @@ class BookTest extends \PHPUnit_Framework_TestCase
             return [];
         }; // required by UserManager; set none
         $this->application->register(new DoctrineServiceProvider());
-        $this->application->register(new UserServiceProvider());
+        //        $this->application->register(new UserServiceProvider());
 
 
         $this->application->boot();
@@ -80,17 +80,17 @@ class BookTest extends \PHPUnit_Framework_TestCase
             $schemaManager->createTable($spec);
         }
 
-        //FIXME too closely tied to user implementation, clean up
-        $user = [
-            'id' => 1,
-            'name' => 'bob',
-            'email' => 'bob@example.com',
-            'password' => 'nonesuch',
-            'salt' => 'dummy',
-            'roles' => 'ROLE_USER',
-            'time_created' => time()
-        ];
-        $this->dbConnection->insert('users', $user);
+        //        //FIXME too closely tied to user implementation, clean up
+        //        $user = [
+        //            'id' => 1,
+        //            'name' => 'bob',
+        //            'email' => 'bob@example.com',
+        //            'password' => 'nonesuch',
+        //            'salt' => 'dummy',
+        //            'roles' => 'ROLE_USER',
+        //            'time_created' => time()
+        //        ];
+        //        $this->dbConnection->insert('users', $user);
 
         parent::setUp();
     }
@@ -108,7 +108,7 @@ class BookTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($tablesPresent) && count($tablesPresent), 'Must get some tables');
 
-        $requiredTables = ['blog_post'];
+        $requiredTables = ['chapters'];
 
         foreach ($requiredTables as $table) {
             $this->assertTrue(in_array($table, $tablesPresent), "Table '$table' is required");
@@ -117,120 +117,123 @@ class BookTest extends \PHPUnit_Framework_TestCase
 
     public function testStoreChapter()
     {
-        $blog = new Book($this->dbConnection, $this->application);
-        $this->assertTrue($blog instanceof Book);
+        $book = new Book($this->dbConnection, $this->application);
+        $this->assertTrue($book instanceof Book);
 
-        $blogPost = new Chapter();
+        $chapter = new Chapter();
 
-        $this->assertTrue($blogPost instanceof Chapter);
-        $blogPost->setSubject('Test blog post');
-        $blogPost->setBody('Post body');
+        $this->assertTrue($chapter instanceof Chapter);
+        $chapter->setSubject('Test blog post');
+        $chapter->setBody('Post body');
+        $chapter->setChapterNumber(1);
+
         //        $blogPost->setCreatorId(1);
 
-        $user = new User('user@example.org'); // todo mock this?
-        $user->setId(1); // for test purpose
-        $blogPost->setCreator($user);
+        //        $user = new User('user@example.org'); // todo mock this?
+        //        $user->setId(1); // for test purpose
+        //        $chapter->setCreator($user);
 
-        $this->assertFalse((bool)$blogPost->getId());
+        $this->assertFalse((bool)$chapter->getId());
 
-        $blog->savePost($blogPost);
-        $this->assertTrue((bool)$blogPost->getId());
+        $book->savePost($chapter);
+        $this->assertTrue((bool)$chapter->getId());
     }
 
     public function testFetchChapter()
     {
         $rawPost = [
-            'subject' => 'Fetch Me',
-            'body' => 'Fascinating Content',
-            'time' => date('Y-m-d h:i:s'),
-            'security' => Chapter::SECURITY_PUBLIC,
-            'creatorId' => 1
+            'title' => 'Fetch Me',
+            'body_text' => 'Fascinating Content',
+            'created_at' => date('Y-m-d h:i:s'),
+            'updated_at' => date('Y-m-d h:i:s'),
+            'is_activated' => 1,
+            'chapter_id' => 3
         ];
 
-        $this->dbConnection->insert('blog_post', $rawPost);
+        $this->dbConnection->insert('chapters', $rawPost);
 
-        $sql = "SELECT MIN(id) FROM blog_post";
+        $sql = "SELECT MIN(id) FROM chapters";
         $presentPostId = $this->dbConnection->fetchColumn($sql);
 
         $this->assertTrue((bool)$presentPostId);
 
-        $blog = new Book($this->dbConnection, $this->application);
+        $book = new Book($this->dbConnection, $this->application);
 
-        $newPost = $blog->fetchPostById($presentPostId);
+        $newPost = $book->fetchChapterById($presentPostId);
 
         $this->assertTrue($newPost instanceof Chapter);
 
         $rawPost = [
-            'subject' => 'Fetch Me First',
-            'body' => 'Earlier Fascinating Content',
-            'time' => date('Y-m-d h:i:s', time() - 3600),
-            'security' => Chapter::SECURITY_PUBLIC,
-            'creatorId' => 1
+            'title' => 'Fetch Me First',
+            'body_text' => 'Fascinating Content',
+            'created_at' => date('Y-m-d h:i:s'),
+            'updated_at' => date('Y-m-d h:i:s'),
+            'is_activated' => 1,
+            'chapter_id' => 2
         ];
 
-        $this->dbConnection->insert('blog_post', $rawPost);
+        $this->dbConnection->insert('chapters', $rawPost);
 
-        $multiPosts = $blog->fetchRecentPosts();
+        $multiPosts = $book->fetchChapters();
         $this->assertTrue(is_array($multiPosts));
         $this->assertSame(2, count($multiPosts));
-        $this->assertTrue($multiPosts[0]->getTime() > $multiPosts[1]->getTime());
+        $this->assertTrue($multiPosts[0]->getChapterNumber() > $multiPosts[1]->getChapterNumber());
     }
 
     public function testWithTimeAndSecurity()
     {
         $rawPosts = [
             [
-                'subject' => 'Old post',
-                'body' => 'Earlier Fascinating Content',
-                'time' => date('Y-m-d H:i:s', time() - 3600),
-                'security' => Chapter::SECURITY_PUBLIC,
-                'creatorId' => 1
+                'title' => 'Old post',
+                'body_text' => 'Earlier Fascinating Content',
+                'created_at' => date('Y-m-d H:i:s', time() - 3600),
+                'updated_at' => date('Y-m-d H:i:s', time() - 3600),
+                'chapter_id' => 1,
+                'is_activated' => 1,
             ],
             [
-                'subject' => 'Private post',
-                'body' => 'Earlier Fascinating Content',
-                'time' => date('Y-m-d H:i:s', time() - 3000),
-                'security' => Chapter::SECURITY_PRIVATE,
-                'creatorId' => 1
+                'title' => 'Private post',
+                'body_text' => 'Earlier Fascinating Content',
+                'created_at' => date('Y-m-d H:i:s', time() - 3000),
+                'updated_at' => date('Y-m-d H:i:s', time() - 3000),
+                'chapter_id' => 2,
+                'is_activated' => 0,
             ],
             [
-                'subject' => 'Another Private post',
-                'body' => 'Earlier Fascinating Content',
-                'time' => date('Y-m-d H:i:s', time() - 2000),
-                'security' => Chapter::SECURITY_PRIVATE,
-                'creatorId' => 1
+                'title' => 'Another Private post',
+                'body_text' => 'Earlier Fascinating Content',
+                'created_at' => date('Y-m-d H:i:s', time() - 2000),
+                'updated_at' => date('Y-m-d H:i:s', time() - 2000),
+                'chapter_id' => 3,
+                'is_activated' => 0,
             ],
             [
-                'subject' => 'Future post',
-                'body' => 'Earlier Fascinating Content',
-                'time' => date('Y-m-d H:i:s', time() + 3600),
-                'security' => Chapter::SECURITY_PUBLIC,
-                'creatorId' => 1
+                'title' => 'Future post',
+                'body_text' => 'Earlier Fascinating Content',
+                'created_at' => date('Y-m-d H:i:s', time() + 3600),
+                'updated_at' => date('Y-m-d H:i:s', time() + 3600),
+                'chapter_id' => 4,
+                'is_activated' => 1,
             ]
         ];
 
         foreach ($rawPosts as $rawPost) {
-            $this->dbConnection->insert('blog_post', $rawPost);
+            $this->dbConnection->insert('chapters', $rawPost);
         }
 
         $blog = new Book($this->dbConnection, $this->application);
 
-        $allRecentPosts = $blog->fetchRecentPosts();
+        $allRecentPosts = $blog->fetchChapters(false);
         $this->assertEquals(4, count($allRecentPosts), 'Expecting 4 recent posts');
 
-        $publicRecentPosts = $blog->fetchRecentPosts(5, true);
+        $publicRecentPosts = $blog->fetchChapters(true);
         $this->assertEquals(2, count($publicRecentPosts), 'Expecting 2 recent public posts');
 
-        $pastRecentPosts = $blog->fetchRecentPosts(5, false, true);
-        $this->assertEquals(3, count($pastRecentPosts), 'Expecting 3 previous recent posts');
-
-        $allPosts = $blog->fetchAllPostsNoBody();
+        $allPosts = $blog->fetchAllChaptersNoBody();
         $this->assertEquals(4, count($allPosts), 'Expecting 4 recent posts in archive');
 
-        $publicPosts = $blog->fetchAllPostsNoBody(true);
+        $publicPosts = $blog->fetchAllChaptersNoBody(true);
         $this->assertEquals(2, count($publicPosts), 'Expecting 2 public posts in archive');
 
-        $pastPosts = $blog->fetchAllPostsNoBody(false, true);
-        $this->assertEquals(3, count($pastPosts), 'Expecting 3 past posts in archive');
     }
 }
