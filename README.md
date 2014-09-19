@@ -1,8 +1,8 @@
-# parsingphase/blog [![Build Status](https://travis-ci.org/parsingphase/blog.svg?branch=master)](https://travis-ci.org/parsingphase/blog)
+# parsingphase/book [![Build Status](https://travis-ci.org/parsingphase/book.svg?branch=master)](https://travis-ci.org/parsingphase/book)
 
-Blog module for the [parsingphase/adze](https://github.com/parsingphase/adze) silex-based platform.
+Book module for the [parsingphase/adze](https://github.com/parsingphase/adze) silex-based platform.
 
-To use, call `$app->mount('/blog', new BlogControllerProvider());` or similar in index.php
+To use, call `$app->mount('/book', new BookControllerProvider());` or similar in index.php
 
 ## ToDo
 

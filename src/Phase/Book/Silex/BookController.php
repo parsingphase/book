@@ -6,12 +6,12 @@
  * Time: 14:23
  */
 
-namespace Phase\Blog\Silex;
+namespace Phase\Book\Silex;
 
 
 use Phase\Adze\Application;
-use Phase\Blog\Blog;
-use Phase\Blog\BlogPost;
+use Phase\Book\Book;
+use Phase\Book\Chapter;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Silex Controller for blog-related pages
- * @package Phase\Blog\Silex
+ * @package Phase\Book\Silex
  */
-class BlogController
+class BookController
 {
     /**
-     * @var Blog
+     * @var Book
      */
     protected $blog;
 
@@ -33,7 +33,7 @@ class BlogController
      */
     protected $app;
 
-    public function __construct(Blog $blog, Application $app)
+    public function __construct(Book $blog, Application $app)
     {
         $this->blog = $blog;
         $this->app = $app;
@@ -51,7 +51,7 @@ class BlogController
         $post = $this->blog->fetchPostById($uid);
 
         if (!(
-            (($post->getSecurity() == BlogPost::SECURITY_PUBLIC) && $post->getTime() < new \DateTime())
+            (($post->getSecurity() == Chapter::SECURITY_PUBLIC) && $post->getTime() < new \DateTime())
             || $this->app->getSecurityContext()->isGranted('ROLE_ADMIN'))
         ) {
             throw new AccessDeniedHttpException; // FIXME just 404?
@@ -86,25 +86,25 @@ class BlogController
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
         $action = $this->app->url('blog.newPost');
 
-        $blogPost = new BlogPost();
+        $blogPost = new Chapter();
         $blogPost->setTime(new \DateTime());
         $creator = $this->app->getCurrentUser();
         $blogPost->setCreator($creator);
 
-        $form = $this->createBlogPostForm($blogPost, $action);
+        $form = $this->createChapterForm($blogPost, $action);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $this->blog->savePost($blogPost);
 
-            $newBlogId = $blogPost->getId();
+            $newBookId = $blogPost->getId();
 
             // redirect somewhere
             return $this->app->redirect(
                 $this->app->path(
                     'blog.post',
-                    ['uid' => $newBlogId, 'slug' => $blogPost->getSlug()]
+                    ['uid' => $newBookId, 'slug' => $blogPost->getSlug()]
                 )
             );
         }
@@ -123,20 +123,20 @@ class BlogController
 
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
         $action = $this->app->url('blog.editPost', ['uid' => $blogPost->getId(), 'slug' => $blogPost->getSlug()]);
-        $form = $this->createBlogPostForm($blogPost, $action);
+        $form = $this->createChapterForm($blogPost, $action);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $this->blog->savePost($blogPost);
 
-            $newBlogId = $blogPost->getId();
+            $newBookId = $blogPost->getId();
 
             // redirect somewhere
             return $this->app->redirect(
                 $this->app->path(
                     'blog.post',
-                    ['uid' => $newBlogId, 'slug' => $blogPost->getSlug()]
+                    ['uid' => $newBookId, 'slug' => $blogPost->getSlug()]
                 )
             );
         }
@@ -145,11 +145,11 @@ class BlogController
     }
 
     /**
-     * @param BlogPost $blogPost
+     * @param Chapter $blogPost
      * @param $action
      * @return Form
      */
-    protected function createBlogPostForm(BlogPost $blogPost, $action)
+    protected function createChapterForm(Chapter $blogPost, $action)
     {
         //NB: data can be array or target object
         $formBuilder = $this->app->getFormFactory()->createBuilder('form', $blogPost)
@@ -160,7 +160,7 @@ class BlogController
             ->add(
                 'security',
                 'choice',
-                ['choices' => [BlogPost::SECURITY_PUBLIC => 'Public', BlogPost::SECURITY_PRIVATE => 'Private']]
+                ['choices' => [Chapter::SECURITY_PUBLIC => 'Public', Chapter::SECURITY_PRIVATE => 'Private']]
             )
             ->setAction($action);
         /* @var FormBuilder $formBuilder Interface definition means PhpStorm chokes there */

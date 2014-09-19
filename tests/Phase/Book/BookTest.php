@@ -6,7 +6,7 @@
  * Time: 15:15
  */
 
-namespace Phase\Blog;
+namespace Phase\Book;
 
 
 use Doctrine\DBAL\Connection;
@@ -15,7 +15,7 @@ use Silex\Provider\DoctrineServiceProvider;
 use SimpleUser\User;
 use SimpleUser\UserServiceProvider;
 
-class BlogTest extends \PHPUnit_Framework_TestCase
+class BookTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var string
@@ -115,14 +115,14 @@ class BlogTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testStoreBlogPost()
+    public function testStoreChapter()
     {
-        $blog = new Blog($this->dbConnection, $this->application);
-        $this->assertTrue($blog instanceof Blog);
+        $blog = new Book($this->dbConnection, $this->application);
+        $this->assertTrue($blog instanceof Book);
 
-        $blogPost = new BlogPost();
+        $blogPost = new Chapter();
 
-        $this->assertTrue($blogPost instanceof BlogPost);
+        $this->assertTrue($blogPost instanceof Chapter);
         $blogPost->setSubject('Test blog post');
         $blogPost->setBody('Post body');
         //        $blogPost->setCreatorId(1);
@@ -137,13 +137,13 @@ class BlogTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue((bool)$blogPost->getId());
     }
 
-    public function testFetchBlogPost()
+    public function testFetchChapter()
     {
         $rawPost = [
             'subject' => 'Fetch Me',
             'body' => 'Fascinating Content',
             'time' => date('Y-m-d h:i:s'),
-            'security' => BlogPost::SECURITY_PUBLIC,
+            'security' => Chapter::SECURITY_PUBLIC,
             'creatorId' => 1
         ];
 
@@ -154,17 +154,17 @@ class BlogTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue((bool)$presentPostId);
 
-        $blog = new Blog($this->dbConnection, $this->application);
+        $blog = new Book($this->dbConnection, $this->application);
 
         $newPost = $blog->fetchPostById($presentPostId);
 
-        $this->assertTrue($newPost instanceof BlogPost);
+        $this->assertTrue($newPost instanceof Chapter);
 
         $rawPost = [
             'subject' => 'Fetch Me First',
             'body' => 'Earlier Fascinating Content',
             'time' => date('Y-m-d h:i:s', time() - 3600),
-            'security' => BlogPost::SECURITY_PUBLIC,
+            'security' => Chapter::SECURITY_PUBLIC,
             'creatorId' => 1
         ];
 
@@ -183,28 +183,28 @@ class BlogTest extends \PHPUnit_Framework_TestCase
                 'subject' => 'Old post',
                 'body' => 'Earlier Fascinating Content',
                 'time' => date('Y-m-d H:i:s', time() - 3600),
-                'security' => BlogPost::SECURITY_PUBLIC,
+                'security' => Chapter::SECURITY_PUBLIC,
                 'creatorId' => 1
             ],
             [
                 'subject' => 'Private post',
                 'body' => 'Earlier Fascinating Content',
                 'time' => date('Y-m-d H:i:s', time() - 3000),
-                'security' => BlogPost::SECURITY_PRIVATE,
+                'security' => Chapter::SECURITY_PRIVATE,
                 'creatorId' => 1
             ],
             [
                 'subject' => 'Another Private post',
                 'body' => 'Earlier Fascinating Content',
                 'time' => date('Y-m-d H:i:s', time() - 2000),
-                'security' => BlogPost::SECURITY_PRIVATE,
+                'security' => Chapter::SECURITY_PRIVATE,
                 'creatorId' => 1
             ],
             [
                 'subject' => 'Future post',
                 'body' => 'Earlier Fascinating Content',
                 'time' => date('Y-m-d H:i:s', time() + 3600),
-                'security' => BlogPost::SECURITY_PUBLIC,
+                'security' => Chapter::SECURITY_PUBLIC,
                 'creatorId' => 1
             ]
         ];
@@ -213,7 +213,7 @@ class BlogTest extends \PHPUnit_Framework_TestCase
             $this->dbConnection->insert('blog_post', $rawPost);
         }
 
-        $blog = new Blog($this->dbConnection, $this->application);
+        $blog = new Book($this->dbConnection, $this->application);
 
         $allRecentPosts = $blog->fetchRecentPosts();
         $this->assertEquals(4, count($allRecentPosts), 'Expecting 4 recent posts');

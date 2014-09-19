@@ -6,20 +6,18 @@
  * Time: 14:16
  */
 
-namespace Phase\Blog;
+namespace Phase\Book;
 
 
 use DateTime;
 use SimpleUser\User;
 
 /**
- * Single blog entry, savable through the Blog class
- * @package Phase\Blog
+ * Single chapter, savable through the Book class
+ * @package Phase\Book
  */
-class BlogPost
+class Chapter
 {
-    const SECURITY_PUBLIC = 'public';
-    const SECURITY_PRIVATE = 'private';
 
     /**
      * @var int|null
@@ -31,7 +29,6 @@ class BlogPost
     protected $time;
     protected $subject;
     protected $body;
-    protected $security = self::SECURITY_PUBLIC;
 
     /**
      * @var User
@@ -74,24 +71,6 @@ class BlogPost
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param mixed $security
-     * @return $this
-     */
-    public function setSecurity($security)
-    {
-        $this->security = $security;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSecurity()
-    {
-        return $this->security;
     }
 
     /**
@@ -139,37 +118,4 @@ class BlogPost
         return (strtolower($slug));
     }
 
-    /**
-     * @return bool
-     */
-    public function isInPast()
-    {
-        return $this->getTime() <= new DateTime();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPublic()
-    {
-        return $this->getSecurity() == self::SECURITY_PUBLIC;
-    }
-
-    /**
-     * @return User
-     */
-    public function getCreator()
-    {
-        return $this->creator;
-    }
-
-    /**
-     * @param User $creator
-     * @return $this
-     */
-    public function setCreator(User $creator)
-    {
-        $this->creator = $creator;
-        return $this;
-    }
 }

@@ -6,7 +6,7 @@
  * Time: 14:10
  */
 
-namespace Phase\Blog;
+namespace Phase\Book;
 
 
 use Doctrine\DBAL\Connection;
@@ -15,9 +15,9 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * Access class for posts on a blog
- * @package Phase\Blog
+ * @package Phase\Book
  */
-class Blog
+class Book
 {
 
     /**
@@ -32,8 +32,8 @@ class Blog
 
     /**
      * //TODO take in $app[] instead of DB and use user.provider, blog.provider ??? as per \SimpleUser\UserManager::__construct
-     * TODO need to add a BlogServiceProvider? (User dataobject does not have access to $app, only UserManager does)
-     * TODO so need Blog(Manager)::hydrateBlogPost($blogPost) calls $blogPost -> setCreator($userManager->getUser($blogPost->getCreatorId))?
+     * TODO need to add a BookServiceProvider? (User dataobject does not have access to $app, only UserManager does)
+     * TODO so need Book(Manager)::hydrateChapter($blogPost) calls $blogPost -> setCreator($userManager->getUser($blogPost->getCreatorId))?
      *
      * Set up access class using given DB connection
      * @param Connection $dbConnection
@@ -48,10 +48,10 @@ class Blog
     /**
      * Store a blog post to the configured DBAL
      *
-     * @param BlogPost $blogPost
+     * @param Chapter $blogPost
      * @return bool
      */
-    public function savePost(BlogPost $blogPost)
+    public function savePost(Chapter $blogPost)
     {
         $return = false;
         $creator = $blogPost->getCreator();
@@ -106,7 +106,7 @@ class Blog
      * Load a blog post from the configured DBAL by primary key
      *
      * @param $presentPostId
-     * @return null|BlogPost
+     * @return null|Chapter
      */
     public function fetchPostById($presentPostId)
     {
@@ -126,7 +126,7 @@ class Blog
      * @param bool $publicOnly
      * @param bool $pastOnly
      * @throws \InvalidArgumentException
-     * @return BlogPost[]
+     * @return Chapter[]
      */
     public function fetchRecentPosts($count = 5, $publicOnly = false, $pastOnly = false)
     {
@@ -140,7 +140,7 @@ class Blog
 
         if ($publicOnly) {
             $whereParts[] = " security= :security ";
-            $queryParams['security'] = BlogPost::SECURITY_PUBLIC;
+            $queryParams['security'] = Chapter::SECURITY_PUBLIC;
         }
 
         if ($pastOnly) {
@@ -169,7 +169,7 @@ class Blog
      *
      * @param bool $publicOnly
      * @param bool $pastOnly
-     * @return BlogPost[]
+     * @return Chapter[]
      */
     public function fetchAllPostsNoBody($publicOnly = false, $pastOnly = false)
     {
@@ -179,7 +179,7 @@ class Blog
 
         if ($publicOnly) {
             $whereParts[] = " security= :security ";
-            $queryParams['security'] = BlogPost::SECURITY_PUBLIC;
+            $queryParams['security'] = Chapter::SECURITY_PUBLIC;
         }
 
         if ($pastOnly) {
@@ -208,7 +208,7 @@ class Blog
      * Create a post class from raw DB row / array
      *
      * @param $row
-     * @return BlogPost
+     * @return Chapter
      */
     protected function createPostFromDbRow($row)
     {
@@ -218,7 +218,7 @@ class Blog
             throw new InvalidParameterException("No such user");
         }
 
-        $post = new BlogPost();
+        $post = new Chapter();
         $post->setId($row['id']);
         $post->setSubject($row['subject']);
         $post->setTime(new \DateTime($row['time']));

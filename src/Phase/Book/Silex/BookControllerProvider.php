@@ -6,23 +6,23 @@
  * Time: 21:16
  */
 
-namespace Phase\Blog\Silex;
+namespace Phase\Book\Silex;
 
 
 use Phase\Adze\Application as AdzeApplication;
-use Phase\Blog\Blog;
+use Phase\Book\Book;
 use Silex\Application as SilexApplication;
 use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 
 /**
- * Silex routing and controller setup for blog-related pages
+ * Silex routing and controller setup for book-related pages
  *
  * @see Silex book chapter 6, ControllerProviders
- * @TODO rename to ....\Silex\BlogControllerProvider?
- * @package Phase\Blog
+ * @TODO rename to ....\Silex\BookControllerProvider?
+ * @package Phase\Book
  */
-class BlogControllerProvider implements ControllerProviderInterface
+class BookControllerProvider implements ControllerProviderInterface
 {
 
     /**
@@ -43,22 +43,22 @@ class BlogControllerProvider implements ControllerProviderInterface
         $moduleBaseDir = dirname(dirname(dirname(dirname(__DIR__))));
 
         $app->getTwigFilesystemLoader()->addPath(
-            $moduleBaseDir . '/templates/blog',
-            'blog'
+            $moduleBaseDir . '/templates/book',
+            'book'
         );
 
-        $app->getResourceController()->addPathMapping('parsingphase/blog', $moduleBaseDir . '/resources');
+        $app->getResourceController()->addPathMapping('parsingphase/book', $moduleBaseDir . '/resources');
 
-        $app['blog.controller'] = $app->share(
+        $app['book.controller'] = $app->share(
             function (AdzeApplication $app) {
                 $dbConnection = $app->getDatabaseConnection();
-                $blog = new Blog($dbConnection, $app);
-                $blogController = new BlogController($blog, $app);
-                return $blogController;
+                $book = new Book($dbConnection, $app);
+                $bookController = new BookController($book, $app);
+                return $bookController;
             }
         );
 
-        // Now set up routes for the blog subsystem
+        // Now set up routes for the book subsystem
 
         /*
          * We have a slight gotcha for IDE code analysis here; Adze defines the Route class that we get dynamically,
@@ -70,33 +70,33 @@ class BlogControllerProvider implements ControllerProviderInterface
          *
          * (Settings -> Inspections -> PHP -> Undefined -> Undefined Method -> Downgrade severity if __magic methods are present)
          *
-         * TODO Move this explanation to a blogpost on phase.org and link to that as required
+         * TODO Move this explanation to a bookpost on phase.org and link to that as required
          */
 
         $controllers->match(
             '/newPost',
-            'blog.controller:newPostAction'
-        )->bind('blog.newPost')->method('POST|GET');
+            'book.controller:newPostAction'
+        )->bind('book.newPost')->method('POST|GET');
 
         $controllers->get(
             '/archive',
-            'blog.controller:archiveAction'
-        )->bind('blog.archive');
+            'book.controller:archiveAction'
+        )->bind('book.archive');
 
         $controllers->match(
             '/{uid}_{slug}/edit',
-            'blog.controller:editPostAction'
-        )->bind('blog.editPost')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
+            'book.controller:editPostAction'
+        )->bind('book.editPost')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
 
         $controllers->get(
             '/{uid}_{slug}',
-            'blog.controller:singlePostAction'
-        )->bind('blog.post')->assert('uid', '\d+');
+            'book.controller:singlePostAction'
+        )->bind('book.post')->assert('uid', '\d+');
 
         $controllers->get(
             '/',
-            'blog.controller:indexAction'
-        )->bind('blog.index');
+            'book.controller:indexAction'
+        )->bind('book.index');
 
         return $controllers;
 
