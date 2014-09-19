@@ -179,7 +179,4 @@ class Chapter
         $this->isActive = $isActive;
         return $this;
     }
-
-
-
 }
