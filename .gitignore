@@ -4,3 +4,4 @@ vendor
 build
 components
 blogtest.sqlite.tmp
+booktest.sqlite.tmp

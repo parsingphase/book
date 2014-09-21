@@ -31,13 +31,14 @@ class BookTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $dbFileSource = dirname(dirname(__DIR__)) . '/resources/blogtest.sqlite';
-        $dbFile = $dbFileSource . '.tmp';
+        $testResourceDir = dirname(dirname(__DIR__)) . '/resources/';
+        $dbFileSource = $testResourceDir . 'empty.sqlite';
+        $dbFile = $testResourceDir . 'booktest.sqlite.tmp';
 
         $copied = copy($dbFileSource, $dbFile);
 
         if (!$copied) {
-            throw new \Exception("Failed to create working copy of blogtest.sqlite");
+            throw new \Exception("Failed to create working copy of empty.sqlite");
         }
 
         $this->dbFile = $dbFile;
@@ -47,15 +48,9 @@ class BookTest extends \PHPUnit_Framework_TestCase
             'path' => $dbFile
         ];
 
-        $this->application = new Application(); //FIXME mock this!
+        $this->application = new Application(); //Simpler to use as-is than to mock
         $this->application['db.options'] = $dbParams;
-        $this->application['security.voters'] = function () {
-            return [];
-        }; // required by UserManager; set none
         $this->application->register(new DoctrineServiceProvider());
-        //        $this->application->register(new UserServiceProvider());
-
-
         $this->application->boot();
 
         $this->dbConnection = $this->application->getDatabaseConnection();
@@ -79,18 +74,6 @@ class BookTest extends \PHPUnit_Framework_TestCase
             }
             $schemaManager->createTable($spec);
         }
-
-        //        //FIXME too closely tied to user implementation, clean up
-        //        $user = [
-        //            'id' => 1,
-        //            'name' => 'bob',
-        //            'email' => 'bob@example.com',
-        //            'password' => 'nonesuch',
-        //            'salt' => 'dummy',
-        //            'roles' => 'ROLE_USER',
-        //            'time_created' => time()
-        //        ];
-        //        $this->dbConnection->insert('users', $user);
 
         parent::setUp();
     }
@@ -126,12 +109,6 @@ class BookTest extends \PHPUnit_Framework_TestCase
         $chapter->setSubject('Test blog post');
         $chapter->setBody('Post body');
         $chapter->setChapterNumber(1);
-
-        //        $blogPost->setCreatorId(1);
-
-        //        $user = new User('user@example.org'); // todo mock this?
-        //        $user->setId(1); // for test purpose
-        //        $chapter->setCreator($user);
 
         $this->assertFalse((bool)$chapter->getId());
 

@@ -93,10 +93,6 @@ class Book
                     'body_text' => $chapter->getBody(),
                     'chapter_id' => $chapter->getChapterNumber(),
                     'is_activated' => $chapter->isActive() ? 1 : 0
-
-
-                    //                    'security' => $chapter->getSecurity(),
-                    //                    'creatorId' => $creator->getId()
                 ]
             );
 
