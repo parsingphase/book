@@ -1,6 +1,6 @@
 {
-    "name": "parsingphase/blog",
-    "description": "Blog module for Adze applications",
+    "name": "parsingphase/book",
+    "description": "Book module for Adze applications",
     "type": "library",
     "license": "MIT",
     "authors": [
