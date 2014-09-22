@@ -33,9 +33,9 @@ class BookController
      */
     protected $app;
 
-    public function __construct(Book $blog, Application $app)
+    public function __construct(Book $book, Application $app)
     {
-        $this->book = $blog;
+        $this->book = $book;
         $this->app = $app;
     }
 
@@ -67,15 +67,7 @@ class BookController
         return $this->app->render('@book/chapter.html.twig', ['chapter' => $chapter, 'chapters' => $index]);
     }
 
-    public function archiveAction()
-    {
-        $pastOnly = $publicOnly = !$this->app->getSecurityContext()->isGranted('ROLE_ADMIN');
-
-        $posts = $this->book->fetchAllChaptersNoBody($publicOnly, $pastOnly);
-        return $this->app->render('@blog/archive.html.twig', ['posts' => $posts]);
-    }
-
-    public function newPostAction(Request $request)
+    public function newChapterAction(Request $request)
     {
         // There may be neater ways of doing this?
         if (!$this->app->getSecurityContext()->isGranted('ROLE_ADMIN')) {
@@ -83,88 +75,80 @@ class BookController
         }
 
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
-        $action = $this->app->url('blog.newPost');
+        $action = $this->app->url('book.newChapter');
 
-        $blogPost = new Chapter();
-        $blogPost->setCreationTime(new \DateTime());
-        $creator = $this->app->getCurrentUser();
-        $blogPost->setCreator($creator);
+        $chapter = new Chapter();
+        $chapter->setCreationTime(new \DateTime());
 
-        $form = $this->createChapterForm($blogPost, $action);
+        $form = $this->createChapterForm($chapter, $action);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->book->savePost($blogPost);
-
-            $newBookId = $blogPost->getId();
+            $this->book->saveChapter($chapter);
 
             // redirect somewhere
             return $this->app->redirect(
                 $this->app->path(
-                    'blog.post',
-                    ['uid' => $newBookId, 'slug' => $blogPost->getSlug()]
+                    'book.readChapter',
+                    ['chapterId' => $chapter->getChapterNumber(), 'slug' => $chapter->getSlug()]
                 )
             );
         }
 
-        return $this->app->render('@blog/editPost.html.twig', ['blogPostForm' => $form->createView()]);
+        return $this->app->render('@book/editChapter.html.twig', ['chapterForm' => $form->createView()]);
     }
 
-    public function editPostAction(Request $request, $uid)
+    public function editChapterAction(Request $request, $uid)
     {
         // There may be neater ways of doing this?
         if (!$this->app->getSecurityContext()->isGranted('ROLE_ADMIN')) {
             throw new AccessDeniedHttpException;
         }
 
-        $blogPost = $this->book->fetchChapterById($uid);
+        $chapter = $this->book->fetchChapterById($uid);
 
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
-        $action = $this->app->url('blog.editPost', ['uid' => $blogPost->getId(), 'slug' => $blogPost->getSlug()]);
-        $form = $this->createChapterForm($blogPost, $action);
+        $action = $this->app->url('book.editChapter', ['uid' => $chapter->getId(), 'slug' => $chapter->getSlug()]);
+        $form = $this->createChapterForm($chapter, $action);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->book->savePost($blogPost);
+            $this->book->saveChapter($chapter);
 
-            $newBookId = $blogPost->getId();
+            $newBookId = $chapter->getId();
 
             // redirect somewhere
             return $this->app->redirect(
                 $this->app->path(
-                    'blog.post',
-                    ['uid' => $newBookId, 'slug' => $blogPost->getSlug()]
+                    'book.readChapter',
+                    ['chapterId' => $chapter->getChapterNumber(), 'slug' => $chapter->getSlug()]
                 )
             );
         }
 
-        return $this->app->render('@blog/editPost.html.twig', ['blogPostForm' => $form->createView()]);
+        return $this->app->render('@book/editChapter.html.twig', ['chapterForm' => $form->createView()]);
     }
 
     /**
-     * @param Chapter $blogPost
+     * @param Chapter $chapter
      * @param $action
      * @return Form
      */
-    protected function createChapterForm(Chapter $blogPost, $action)
+    protected function createChapterForm(Chapter $chapter, $action)
     {
         //NB: data can be array or target object
-        $formBuilder = $this->app->getFormFactory()->createBuilder('form', $blogPost)
+        $formBuilder = $this->app->getFormFactory()->createBuilder('form', $chapter)
             ->add('subject')
+            ->add('chapterNumber', 'integer', ['label'=>'Chapter #'])
+            ->add('active', 'checkbox', ['value' => 1])
             ->add('body', 'textarea')
-            ->add('time', 'datetime')
             ->add('save', 'submit')
-            ->add(
-                'security',
-                'choice',
-                ['choices' => [Chapter::SECURITY_PUBLIC => 'Public', Chapter::SECURITY_PRIVATE => 'Private']]
-            )
             ->setAction($action);
         /* @var FormBuilder $formBuilder Interface definition means PhpStorm chokes there */
 
-        if ($blogPost->getId()) {
+        if ($chapter->getId()) {
             $formBuilder->add('id', 'hidden');
         }
 

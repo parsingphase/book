@@ -51,7 +51,7 @@ class Book
      * @param Chapter $chapter
      * @return bool
      */
-    public function savePost(Chapter $chapter)
+    public function saveChapter(Chapter $chapter)
     {
         $return = false;
         //        $creator = $blogPost->getCreator();

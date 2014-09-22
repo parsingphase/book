@@ -111,8 +111,7 @@ class BookTest extends \PHPUnit_Framework_TestCase
         $chapter->setChapterNumber(1);
 
         $this->assertFalse((bool)$chapter->getId());
-
-        $book->savePost($chapter);
+        $book->saveChapter($chapter);
         $this->assertTrue((bool)$chapter->getId());
     }
 
@@ -201,18 +200,18 @@ class BookTest extends \PHPUnit_Framework_TestCase
             $this->dbConnection->insert('chapter', $rawPost);
         }
 
-        $blog = new Book($this->dbConnection, $this->application);
+        $book = new Book($this->dbConnection, $this->application);
 
-        $allRecentPosts = $blog->fetchChapters(false);
+        $allRecentPosts = $book->fetchChapters(false);
         $this->assertEquals(4, count($allRecentPosts), 'Expecting 4 recent posts');
 
-        $publicRecentPosts = $blog->fetchChapters(true);
+        $publicRecentPosts = $book->fetchChapters(true);
         $this->assertEquals(2, count($publicRecentPosts), 'Expecting 2 recent public posts');
 
-        $allPosts = $blog->fetchAllChaptersNoBody();
+        $allPosts = $book->fetchAllChaptersNoBody();
         $this->assertEquals(4, count($allPosts), 'Expecting 4 recent posts in archive');
 
-        $publicPosts = $blog->fetchAllChaptersNoBody(true);
+        $publicPosts = $book->fetchAllChaptersNoBody(true);
         $this->assertEquals(2, count($publicPosts), 'Expecting 2 public posts in archive');
 
     }

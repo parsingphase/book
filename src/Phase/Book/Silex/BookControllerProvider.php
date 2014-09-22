@@ -60,31 +60,13 @@ class BookControllerProvider implements ControllerProviderInterface
 
         // Now set up routes for the book subsystem
 
-        /*
-         * We have a slight gotcha for IDE code analysis here; Adze defines the Route class that we get dynamically,
-         * and Phase\Adze\Route implements the \Silex\Route\SecurityTrait - but the object we call is a
-         * \Silex\ControllerCollection that uses __call to pass through to the route, leaving IDEs baffled and unable
-         * to recognise that ControllerCollection can handle ->secure()
-         *
-         * For PHPStorm, see http://stackoverflow.com/a/12583095/113076
-         *
-         * (Settings -> Inspections -> PHP -> Undefined -> Undefined Method -> Downgrade severity if __magic methods are present)
-         *
-         * TODO Move this explanation to a bookpost on phase.org and link to that as required
-         */
-
         $controllers->match(
             '/new',
             'book.controller:newChapterAction'
         )->bind('book.newChapter')->method('POST|GET');
 
-//        $controllers->get(
-//            '/archive',
-//            'book.controller:archiveAction'
-//        )->bind('book.archive');
-
         $controllers->match(
-            '/part/{chapterId}/{slug}/edit',
+            '/part/{uid}/{slug}/edit', // NB UID not chapterId as we need to access non-active and alternate versions
             'book.controller:editChapterAction'
         )->bind('book.editChapter')->assert('uid', '\d+')->method('POST|GET')->secure('ROLE_ADMIN');
 

@@ -1,0 +1,58 @@
+{% extends '@book/layout-book.html.twig' %}
+
+{% block title %}{% if title is defined %}{{ title }}{% else %}Edit Post{% endif %} | Blog{% endblock %}
+
+{% block content %}
+    <div>
+
+        <div class="well">
+            {% if is_granted('ROLE_ADMIN') %}
+                {#<form action="#" method="post" role="form">#}
+                {% set form = chapterForm %}
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
+
+                <div class="xcontainer">
+
+                    <div class="form-group col-md-2">
+                        {{ form_label(form.chapterNumber) }}
+                        {{ form_errors(form.chapterNumber) }}
+                        {{ form_widget(form.chapterNumber, {'attr': {'class': 'form-control' }}) }}
+                    </div>
+
+                    <div class="form-group col-md-9">
+                        {{ form_label(form.subject) }}
+                        {{ form_errors(form.subject) }}
+                        {{ form_widget(form.subject, {'attr': {'class': 'form-control' }}) }}
+                    </div>
+
+                    <div class="form-group col-md-1">
+                        {{ form_label(form.active) }}
+                        {{ form_errors(form.active) }}
+                        {{ form_widget(form.active, {'attr': {'class': 'form-control' }}) }}
+                    </div>
+
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="form-group">
+                    {{ form_label(form.body) }}
+                    {{ form_errors(form.body) }}
+                    {{ form_widget(form.body, {'attr': {'class': 'form-control', 'rows': 20 }}) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.save) }}
+                    {#{{ form_errors(form.save) }}#}
+                    {{ form_widget(form.save, {'attr': {'class': 'btn btn-default' }}) }}
+                </div>
+                {{ form_end(form) }}
+                {#<input type="submit" name="submit" class="btn"/>#}
+                {#</form>#}
+            {% else %}
+                <div class="alert alert-danger">Admin access only</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

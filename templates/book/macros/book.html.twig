@@ -1,6 +1,5 @@
 {% macro chapterStatusIcons(chapter) %}
     {% if not chapter.active %}<span class="glyphicon glyphicon-eye-close"></span>{% endif %}
-    {#{% if not post.inPast %}<span class="glyphicon glyphicon-calendar"></span>{% endif %}#}
 {% endmacro %}
 
 {% macro indexPagePost(chapter) %}
@@ -15,7 +14,7 @@
         </div>
         <div class="panel-footer">
             <div class="pull-right">
-                <a href="{{ path('book.readChapter',{chapterId: chapter.id, slug: chapter.slug}) }}">Permalink</a>
+                <a href="{{ path('book.readChapter',{chapterId: chapter.id, slug: chapter.slug}) }}">Read More</a>
             </div>
             <div class="clearfix"></div>
         </div>
@@ -27,9 +26,9 @@
 
     <div class="singlePageBlogPost">
         <div class="pull-right">
-            {#{% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"#}
-            {#href="{{ path('book.editPost',{uid: post.id, slug: post.slug}) }}"><span#}
-            {#class="glyphicon glyphicon-pencil"></span> Edit</a> {% endif %}#}
+            {% if is_granted('ROLE_ADMIN') %}<a class="btn btn-default"
+            href="{{ path('book.editChapter',{uid: chapter.id, slug: chapter.slug}) }}"><span
+            class="glyphicon glyphicon-pencil"></span> Edit</a> {% endif %}
         </div>
 
         <h1>{{ book.chapterStatusIcons(chapter) }}
