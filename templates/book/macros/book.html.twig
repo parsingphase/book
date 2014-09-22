@@ -44,3 +44,50 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro tableOfContents(chapters,currentChapter) %}
+    <div class="well book-toc">
+        <h3>Contents</h3>
+        <ul>
+            <li><a href="{{ path('book.index') }}">Index</a></li>
+            {% for tocChapter in chapters %}
+                {% if tocChapter.chapterNumber == currentChapter %}
+                    <li>» {{ tocChapter.chapterNumber }} {{ tocChapter.subject }}</li>
+                {% else %}
+                    <li>
+                        <a href="{{ path('book.readChapter',{chapterId: tocChapter.id, slug: tocChapter.slug}) }}">{{ tocChapter.chapterNumber }} {{ tocChapter.subject }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+
+{% macro prevNextChapter(chapters,currentChapter) %}
+    <div class="bookNav well">
+        {% set prevChapterNumber = currentChapter-1 %}
+        {% set nextChapterNumber = currentChapter+1 %}
+        {% set prevChapter = null %}
+        {% set nextChapter = null %}
+
+        {% for tocChapter in chapters %}
+            {% if tocChapter.chapterNumber == prevChapterNumber %}
+                {% set prevChapter = tocChapter %}
+            {% elseif tocChapter.chapterNumber == nextChapterNumber %}
+                {% set nextChapter = tocChapter %}
+            {% endif %}
+        {% endfor %}
+
+        <div class="prevChapter col-sm-5 text-left">{% if prevChapter %}
+                Back: <a
+                        href="{{ path('book.readChapter',{chapterId: prevChapter.id, slug: prevChapter.slug}) }}">{{ prevChapter.subject }}</a>
+            {% endif %}</div>
+        <div class="toIndex col-sm-2 text-center">Up: <a href="{{ path('book.index') }}">Index</a></div>
+        <div class="nextChapter col-sm-5 text-right">{% if nextChapter %}
+                Next: <a
+                        href="{{ path('book.readChapter',{chapterId: nextChapter.id, slug: nextChapter.slug}) }}">{{ nextChapter.subject }}</a>
+            {% endif %}</div>
+        <div class="clearfix"></div>
+    </div>
+{% endmacro %}

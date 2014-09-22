@@ -2,23 +2,37 @@
   font-style: italic;
   margin-top: 0.8em;
 }
+.book-toc h3 {
+  margin: 0 0 8px 0;
+  font-size: 140%;
+}
+.book-toc ul {
+  display: block;
+  list-style-type: none;
+  padding-left: 0;
+}
+.book-toc li {
+  display: block;
+  margin-left: 0;
+  padding-bottom: 0.4em;
+}
 .chapterbody h1 {
-  padding: 0;
+  padding: 0.8em 0 0.3em 0;
   font-size: 1.5em;
 }
 .chapterbody h2 {
-  padding: 0;
+  padding: 0.8em 0 0.3em 0;
   font-size: 1.4em;
 }
 .chapterbody h3 {
-  padding: 0;
+  padding: 0.8em 0 0.3em 0;
   font-size: 1.3em;
 }
 .chapterbody h4 {
-  padding: 0;
+  padding: 0.5em 0 0.3em 0;
   font-size: 1.2em;
 }
 .chapterbody h5 {
-  padding: 0;
+  padding: 0.5em 0 0.3em 0;
   font-size: 1.1em;
 }

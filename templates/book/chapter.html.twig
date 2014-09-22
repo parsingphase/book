@@ -5,14 +5,13 @@
 {% block pageTitle %}{{ chapter.subject }}{% endblock %}
 
 {% block content %}
+    {{ book.prevNextChapter(chapters,chapter.chapterNumber) }}
     <div class="blogPage blogPageSinglePost">
         {{ book.singlePagePost(chapter) }}
     </div>
 {% endblock %}
 
-{#{% block sidebar %}#}
-    {#{{ parent() }}#}
-    {#<div class="well">#}
-        {#<a href="{{ path('blog.index') }}">Back to blog index</a>#}
-    {#</div>#}
-{#{% endblock %}#}
+{% block sidebar %}
+    {{ parent() }}
+    {{ book.tableOfContents(chapters,chapter.chapterNumber) }}
+{% endblock %}

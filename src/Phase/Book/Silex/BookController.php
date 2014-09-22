@@ -26,7 +26,7 @@ class BookController
     /**
      * @var Book
      */
-    protected $blog;
+    protected $book;
 
     /**
      * @var Application
@@ -35,19 +35,20 @@ class BookController
 
     public function __construct(Book $blog, Application $app)
     {
-        $this->blog = $blog;
+        $this->book = $blog;
         $this->app = $app;
     }
 
     public function indexAction()
     {
-        $chapters = $this->blog->fetchChapters();
+        $chapters = $this->book->fetchChapters();
         return $this->app->render('@book/index.html.twig', ['chapters' => $chapters]);
     }
 
     public function readChapterAction($chapterId, $slug)
     {
-        $chapter = $this->blog->fetchChapterById($chapterId);
+        $chapter = $this->book->fetchChapterById($chapterId);
+        $index = $this->book->fetchAllChaptersNoBody();
 
         if (!($chapter->isActive()
             || $this->app->getSecurityContext()->isGranted('ROLE_ADMIN'))
@@ -63,14 +64,14 @@ class BookController
                 )
             );
         }
-        return $this->app->render('@book/chapter.html.twig', ['chapter' => $chapter]);
+        return $this->app->render('@book/chapter.html.twig', ['chapter' => $chapter, 'chapters' => $index]);
     }
 
     public function archiveAction()
     {
         $pastOnly = $publicOnly = !$this->app->getSecurityContext()->isGranted('ROLE_ADMIN');
 
-        $posts = $this->blog->fetchAllChaptersNoBody($publicOnly, $pastOnly);
+        $posts = $this->book->fetchAllChaptersNoBody($publicOnly, $pastOnly);
         return $this->app->render('@blog/archive.html.twig', ['posts' => $posts]);
     }
 
@@ -94,7 +95,7 @@ class BookController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->blog->savePost($blogPost);
+            $this->book->savePost($blogPost);
 
             $newBookId = $blogPost->getId();
 
@@ -117,7 +118,7 @@ class BookController
             throw new AccessDeniedHttpException;
         }
 
-        $blogPost = $this->blog->fetchChapterById($uid);
+        $blogPost = $this->book->fetchChapterById($uid);
 
         //Forms ref: http://symfony.com/doc/2.5/book/forms.html
         $action = $this->app->url('blog.editPost', ['uid' => $blogPost->getId(), 'slug' => $blogPost->getSlug()]);
@@ -126,7 +127,7 @@ class BookController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->blog->savePost($blogPost);
+            $this->book->savePost($blogPost);
 
             $newBookId = $blogPost->getId();
 
