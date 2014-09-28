@@ -2,7 +2,7 @@
 
 {% import '@book/macros/book.html.twig' as book %}
 
-{#{% block pageTitle %}Blog{% endblock %}#}
+{% block pageTitle %}Contents{% endblock %}
 
 {% block content %}
     <div class="blogPage blogIndex">
@@ -17,4 +17,9 @@
             </div>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block sidebar %}
+    {{ parent() }}
+    {{ book.tableOfContents(chapters,0) }}
 {% endblock %}
