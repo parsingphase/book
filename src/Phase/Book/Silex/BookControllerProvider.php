@@ -9,6 +9,8 @@
 namespace Phase\Book\Silex;
 
 
+use Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine;
+use Aptoma\Twig\Extension\MarkdownExtension;
 use Phase\Adze\Application as AdzeApplication;
 use Phase\Book\Book;
 use Silex\Application as SilexApplication;
@@ -19,7 +21,6 @@ use Silex\ControllerProviderInterface;
  * Silex routing and controller setup for book-related pages
  *
  * @see Silex book chapter 6, ControllerProviders
- * @TODO rename to ....\Silex\BookControllerProvider?
  * @package Phase\Book
  */
 class BookControllerProvider implements ControllerProviderInterface
@@ -38,6 +39,26 @@ class BookControllerProvider implements ControllerProviderInterface
         // It's possible we should really do this as a ServiceProvider ... ?
 
         $app = AdzeApplication::assertAdzeApplication($app);
+
+
+        $app['twig'] = $app->share(
+            $app->extend(
+                'twig',
+                function ($twig, $app) {
+                    // add custom globals, filters, tags, ...
+                    $engine = new MichelfMarkdownEngine();
+
+                    $twig->addExtension(new MarkdownExtension($engine));
+                    return $twig;
+                }
+            )
+        );
+
+
+
+
+
+
         $controllers = $app->getControllerFactory();
 
         $moduleBaseDir = dirname(dirname(dirname(dirname(__DIR__))));

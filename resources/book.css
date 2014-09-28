@@ -1,6 +1,11 @@
-.singlePageBlogPost .attribution {
+.singlePageChapter .attribution {
   font-style: italic;
   margin-top: 0.8em;
+}
+.singlePageChapter h1.chapterTitle {
+  font-size: 1.8em;
+  padding-left: 0.8em;
+  padding-bottom: 0.4em;
 }
 .book-toc h3 {
   margin: 0 0 8px 0;
