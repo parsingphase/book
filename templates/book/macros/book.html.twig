@@ -10,7 +10,7 @@
                 <span class="chapterTitle">{{ chapter.chapterNumber }}) {{ chapter.subject }}</span></a>
         </div>
         <div class="panel-body">
-            {{ chapter.body|striptags|slice(0,600) }}...
+            {{ chapter.body|slice(0,1000)|markdown }}...
         </div>
         <div class="panel-footer">
             <div class="pull-right">
