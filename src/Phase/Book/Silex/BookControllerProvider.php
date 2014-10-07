@@ -63,6 +63,13 @@ class BookControllerProvider implements ControllerProviderInterface
 
         $moduleBaseDir = dirname(dirname(dirname(dirname(__DIR__))));
 
+        //Identify exact path
+        $app->getTwigFilesystemLoader()->addPath(
+            $moduleBaseDir . '/templates/book/default',
+            'book'
+        );
+
+        //Identify parent path so that we can refer directly to @book/default if required
         $app->getTwigFilesystemLoader()->addPath(
             $moduleBaseDir . '/templates/book',
             'book'
