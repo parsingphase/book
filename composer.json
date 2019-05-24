@@ -11,8 +11,8 @@
     ],
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/parsingphase/adze.git"
+            "type": "composer",
+            "url": "https://satis.phase.org"
         }
     ],
     "autoload": {
@@ -22,9 +22,9 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": "~5.5",
+        "php": "~5.5||^7.0",
         "doctrine/dbal": "~2.4",
-        "parsingphase/adze": "dev-master",
+        "parsingphase/adze": "^1.0.0",
         "aptoma/twig-markdown": "~1.0",
         "michelf/php-markdown": "~1.4"
     },
@@ -35,10 +35,5 @@
         "squizlabs/php_codesniffer": "~1.5",
         "ext-pdo_sqlite": "*",
         "leafo/lessphp": "~0.4"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.1.x-dev"
-        }
     }
 }
